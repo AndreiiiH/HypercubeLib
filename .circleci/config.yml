@@ -9,9 +9,9 @@ jobs:
     steps:
       - checkout
       - run: chmod +x gradlew
-      - run:
       - restore_cache:
           key: hypercubelib-{{ checksum "build.gradle" }}
+      - run: export TERM=${TERM:-dumb} && ./gradlew -q setupCiWorkspace
       - run: export TERM=${TERM:-dumb} && ./gradlew -q resolveDependencies
       - save_cache:
           paths:
