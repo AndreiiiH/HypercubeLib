@@ -29,24 +29,42 @@
  *
  * Copyright (c) 2018-2019 AndreiiiH <hava.ionut@gmail.com>
  */
-package andreiiih.hypercube.core;
+package andreiiih.hypercubelib;
 
+import andreiiih.hypercubelib.cache.CacheItemHeader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = HypercubeCore.ID, name = HypercubeCore.NAME, version = HypercubeCore.VERSION, useMetadata = true)
-public class HypercubeCore {
+import java.io.File;
 
-    public final static String ID = "hypercubecore";
-    public final static String NAME = "Hypercube Core";
+@Mod(modid = HypercubeLib.ID, name = HypercubeLib.NAME, version = HypercubeLib.VERSION, useMetadata = true)
+public class HypercubeLib {
+
+    public final static String ID = "hypercubelib";
+    public final static String NAME = "HypercubeLib";
     public final static String VERSION = "1.0.0";
 
     public final static Logger LOG = LogManager.getLogger();
 
+    public static File configDir;
+
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) {
-        LOG.info("Success!");
+        configDir = event.getModConfigurationDirectory();
+
+        HypercubeLibConstants.setModId("hypercubelib");
+
+        byte[] data = new byte[50];
+        CacheItemHeader header = new CacheItemHeader(HypercubeLibConstants.TYPE_MODEL, HypercubeLibConstants.MODEL_VERSION);
+
+        header.serialize(data, 0);
+
+        try {
+            header.deserialize(data);
+        } catch (Exception e) {
+            LOG.error(e);
+        }
     }
 }

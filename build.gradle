@@ -28,7 +28,7 @@ versioning {
 }
 
 version = "${versioning.major}.${versioning.minor}.${versioning.patch}.${versioning.build}${versioning.preRelease}"
-group = "andreiiih.hypercube"
+group = "andreiiih.hypercubelib"
 archivesBaseName = "hypercubelib"
 
 println "Building ${project.group}:${project.archivesBaseName}:${project.version}"
