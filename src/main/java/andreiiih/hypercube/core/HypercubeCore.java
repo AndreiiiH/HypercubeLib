@@ -27,7 +27,7 @@
  *     For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
  *
  *
- * Copyright (c) 2018-2019 Andrei Hava / AndreiiiH / AndyAndreiH <hava.ionut@gmail.com>
+ * Copyright (c) 2018-2019 AndreiiiH <hava.ionut@gmail.com>
  */
 package andreiiih.hypercube.core;
 
@@ -41,7 +41,7 @@ public class HypercubeCore {
 
     public final static String ID = "hypercubecore";
     public final static String NAME = "Hypercube Core";
-    public final static String VERSION = "${version}";
+    public final static String VERSION = "1.0.0";
 
     public final static Logger LOG = LogManager.getLogger();
 

@@ -3,7 +3,7 @@
     "modid": "hypercubecore",
     "name": "Hypercube Core",
     "description": "3D & GUI rendering library for MC Forge 1.12.2+",
-    "version": "[VERSION]",
+    "version": "${version}",
     "mcversion": "${mcversion}",
     "logoFile": "assets/hypercubecore/textures/logo.png",
     "url": "",

@@ -13,14 +13,23 @@ buildscript {
 
 plugins {
     id "com.github.hierynomus.license" version "0.15.0"
-    id 'net.nemerosa.versioning' version '2.8.2'
+    id "eu.davidea.grabver" version "1.0.1"
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.0-${versioning.info.branchType}${versioning.info.build}-Build${getTimestamp()}-MC${versioning.info.base}"
+versioning {
+    major 1
+    minor 0
+    patch 0
+    preRelease "-beta1"
+//  preRelease "-rc1"
+//  preRelease "-final"
+}
+
+version = "${versioning.major}.${versioning.minor}.${versioning.patch}.${versioning.build}${versioning.preRelease}"
 group = "andreiiih.hypercube"
-archivesBaseName = "core"
+archivesBaseName = "hypercubelib"
 
 println "Building ${project.group}:${project.archivesBaseName}:${project.version}"
 
@@ -46,38 +55,22 @@ dependencies {
 }
 
 processResources {
-//    inputs.property "version", project.version
-//    inputs.property "mcversion", project.minecraft.version
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
 
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-
-    from(sourceSets.main.java.srcDirs) {
-        include 'HypercubeCore.java'
-
-        expand 'version':project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-
-    from(sourceSets.main.java.srcDirs) {
-        exclude 'HypercubeCore.java'
-    }
 }
+
+version = "${minecraft.version}-${version}"
 
 license {
     header = file('LICENSE.txt')
     exclude '**/src/api/**'
     exclude '**/LICENSE.txt'
-
-    ext.year = Calendar.getInstance().get(Calendar.YEAR)
-    ext.name = 'AndreiiiH'
-    ext.email = 'hava.ionut@gmail.com'
 }
 
 licenseApi {
@@ -88,8 +81,15 @@ licenseFormatApi {
     exclude '**/*'
 }
 
-def getTimestamp() {
-    def date = new Date()
-    long unix = (long)date.getTime() / 1000
-    return unix
+task resolveDependencies {
+    doLast {
+        project.rootProject.allprojects.each { subProject ->
+            subProject.buildscript.configurations.each { configuration ->
+                configuration.resolve()
+            }
+            subProject.configurations.each { configuration ->
+                configuration.resolve()
+            }
+        }
+    }
 }
