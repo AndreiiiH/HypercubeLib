@@ -2,19 +2,21 @@ version: 2
 jobs:
   build:
     working_directory: ~/hypercubelib-workdir
-    
+
     docker:
       - image: circleci/openjdk:8-jdk-browsers
 
     steps:
       - checkout
+      - run: chmod +x gradlew
+      - run:
       - restore_cache:
           key: hypercubelib-{{ checksum "build.gradle" }}
-      - run: ./gradlew -q resolveDependencies
+      - run: export TERM=${TERM:-dumb} && ./gradlew -q resolveDependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: hypercubelib-{{ checksum "build.gradle" }}
-      - run: ./gradlew build
-      - store_test_results:
-          path: target/build-reports
+      - run: export TERM=${TERM:-dumb} && ./gradlew build
+      - store_artifacts:
+          path: build/libs
