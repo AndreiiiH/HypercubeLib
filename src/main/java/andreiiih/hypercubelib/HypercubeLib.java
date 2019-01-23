@@ -31,7 +31,10 @@
  */
 package andreiiih.hypercubelib;
 
-import andreiiih.hypercubelib.cache.CacheItemHeader;
+import andreiiih.hypercubelib.core.IntRef;
+import andreiiih.hypercubelib.serialization.ObjectTypeRegistry;
+import andreiiih.hypercubelib.serialization.SDHeader;
+import andreiiih.hypercubelib.util.FileUtils;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
@@ -56,15 +59,46 @@ public class HypercubeLib {
 
         HypercubeLibConstants.setModId("hypercubelib");
 
-        byte[] data = new byte[50];
-        CacheItemHeader header = new CacheItemHeader(HypercubeLibConstants.TYPE_MODEL, HypercubeLibConstants.MODEL_VERSION);
+        SDHeader header;
 
-        header.serialize(data, 0);
-
+        long start = System.currentTimeMillis();
         try {
-            header.deserialize(data);
+            ObjectTypeRegistry.register(SDHeader.class);
+//
+//            header = new SDHeader();
+//            header.setDataLength(50);
+//
+//            byte[] serialized = new byte[header.size()];
+//            header.copyToBuffer(serialized, new IntRef(0));
+//
+//            FileUtils.writeFile(
+//                    new File(
+//                            FileUtils.getModCacheDir(
+//                                    HypercubeLibConstants.getModId()
+//                            ), "test" + HypercubeLibConstants.CACHE_FILE_EXT).toPath()
+//                    , serialized);
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error("Congrats! A unicorn!", e);
         }
+        long finish = System.currentTimeMillis();
+        long timeElapsed = finish - start;
+
+//        LOG.warn("Serialization finished! Time elapsed: " + timeElapsed + " ms");
+
+        start = System.currentTimeMillis();
+        try {
+            byte[] data = FileUtils.readFile(new File(
+                    FileUtils.getModCacheDir(
+                            HypercubeLibConstants.getModId()
+                    ), "test" + HypercubeLibConstants.CACHE_FILE_EXT).toPath());
+
+            header = new SDHeader().copyFromBuffer(data, new IntRef(0));
+        } catch (Exception e) {
+            LOG.error("Congrats! A unicorn!", e);
+        }
+        finish = System.currentTimeMillis();
+        timeElapsed = finish - start;
+
+        LOG.warn("Deserialization finished! Time elapsed: " + timeElapsed + " ms");
     }
 }

@@ -37,6 +37,10 @@ public final class FileUtils {
         return Files.readAllBytes(file);
     }
 
+    public static void writeFile(Path file, byte[] data) throws IOException {
+        Files.write(file, data);
+    }
+
     protected static File mkdirIfNotExist(File dir) {
         if (!dir.exists() || !dir.isDirectory()) {
             dir.mkdir();
