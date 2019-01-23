@@ -1,4 +1,10 @@
 package andreiiih.hypercubelib.cache;
 
-public class CacheItem {
+public abstract class CacheItem {
+
+    private final CacheFile file;
+
+    public CacheItem(String name) {
+        file = new CacheFile(name);
+    }
 }
