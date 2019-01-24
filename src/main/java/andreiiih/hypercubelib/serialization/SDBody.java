@@ -34,71 +34,87 @@ package andreiiih.hypercubelib.serialization;
 import andreiiih.hypercubelib.HypercubeLib;
 import andreiiih.hypercubelib.core.IntRef;
 import andreiiih.hypercubelib.exceptions.IdentifierNotFoundException;
+import andreiiih.hypercubelib.exceptions.UnsupportedContainerTypeException;
 
-public abstract class SDObject<T extends SDObject> extends SDPart<T> {
+import java.util.LinkedList;
 
-    protected long dataLength;
-    protected byte[] data;
+public class SDBody extends SDPart<SDBody> {
 
-    private SDField sdDataLength;
-    private SDArray sdData;
+    protected LinkedList<SDObject> objects = new LinkedList<>();
 
-    public SDObject(Class<T> type) throws IdentifierNotFoundException {
-        super(type);
+    public SDBody() throws IdentifierNotFoundException {
+        super(SDBody.class);
 
         init();
     }
 
-    @Override
-    protected void init() {
-        super.init();
-
-        data = new byte[] { 0 };
-
-        try {
-            sdDataLength = SDField.Builder.Long("dataLength", dataLength);
-            sdData = SDArray.Builder.Byte("data", data);
-        } catch (Exception e) {
-            HypercubeLib.LOG.error("Error encountered during header init", e);
-        }
+    public void addObject(SDObject object) {
+        objects.add(object);
     }
 
-    protected abstract void serialize();
+    public void removeObject(SDObject object) {
+        objects.remove(object);
+    }
 
-    protected abstract T deserialise();
+    public LinkedList<SDObject> getObjects() {
+        return objects;
+    }
 
     @Override
     public void copyToBuffer(byte[] dest, IntRef pointer) {
         super.copyToBuffer(dest, pointer);
 
-        serialize();
-
-        sdDataLength.copyToBuffer(dest, pointer);
-        sdData.copyToBuffer(dest, pointer);
+        for (SDObject object : objects) {
+            object.copyToBuffer(dest, pointer);
+        }
     }
 
     @Override
-    public SDObject<T> copyFromBuffer(byte[] src, IntRef pointer) {
+    public SDBody copyFromBuffer(byte[] src, IntRef pointer) {
         super.copyFromBuffer(src, pointer);
 
         try {
-            sdDataLength.copyFromBuffer(src, pointer);
-            sdData.copyFromBuffer(src, pointer);
+            if (ObjectTypeRegistry.get(src[pointer.g()]) != SDBody.class) {
+                HypercubeLib.LOG.error("Error encountered during body copy from buffer",
+                        new UnsupportedContainerTypeException(ObjectTypeRegistry.get(SDBody.class), src[pointer.g()]));
+                return null;
+            }
         } catch (Exception e) {
-            HypercubeLib.LOG.error(e);
+            HypercubeLib.LOG.error("Error encountered during body copy from buffer", e);
+            return null;
         }
 
-        dataLength = (long)sdDataLength.deserialise();
-        data = (byte[])sdData.deserialise();
+        pointer.incr();
+
+        while (pointer.g() < src.length) {
+            try {
+                Class<?> type = ObjectTypeRegistry.get(src[pointer.g()]);
+                if (type.getSuperclass() != SDObject.class) {
+                    HypercubeLib.LOG.error("Error encountered during body copy from buffer",
+                            new UnsupportedContainerTypeException((byte)0, src[pointer.g()]));
+                    return null;
+                }
+
+                SDObject instance = (SDObject)type.newInstance();
+                instance.copyFromBuffer(src, pointer);
+                objects.add(instance);
+            } catch (Exception e) {
+                HypercubeLib.LOG.error("Error encountered during body copy from buffer", e);
+                return null;
+            }
+        }
 
         return this;
     }
 
     @Override
     public int size() {
-        return
-                super.size() +
-                sdDataLength.size() +
-                sdData.size();
+        int size = super.size();
+
+        for (SDObject object : objects) {
+            size += object.size();
+        }
+
+        return size;
     }
 }

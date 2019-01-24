@@ -31,11 +31,37 @@
  */
 package andreiiih.hypercubelib.cache;
 
-public abstract class CacheItem {
+import andreiiih.hypercubelib.HypercubeLib;
+import andreiiih.hypercubelib.exceptions.IdentifierNotFoundException;
+import andreiiih.hypercubelib.serialization.ObjectTypeRegistry;
+import andreiiih.hypercubelib.serialization.SDObject;
 
-    private final CacheFile file;
+public class CacheItem extends SDObject<CacheItem> {
 
-    public CacheItem(String name) {
-        file = new CacheFile(name);
+    public byte[] payload;
+
+    static {
+        try {
+            ObjectTypeRegistry.register(CacheItem.class);
+        } catch (Exception e) {
+            HypercubeLib.LOG.error("Error during cache item registration", e);
+        }
+    }
+
+    public CacheItem() throws IdentifierNotFoundException {
+        super(CacheItem.class);
+    }
+
+    @Override
+    protected void serialize() {
+        data = payload;
+        dataLength = payload.length;
+    }
+
+    @Override
+    protected CacheItem deserialise() {
+        payload = data;
+
+        return this;
     }
 }

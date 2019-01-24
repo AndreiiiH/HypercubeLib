@@ -31,10 +31,8 @@
  */
 package andreiiih.hypercubelib;
 
-import andreiiih.hypercubelib.core.IntRef;
-import andreiiih.hypercubelib.serialization.ObjectTypeRegistry;
-import andreiiih.hypercubelib.serialization.SDHeader;
-import andreiiih.hypercubelib.util.FileUtils;
+import andreiiih.hypercubelib.cache.CacheFile;
+import andreiiih.hypercubelib.cache.CacheItem;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
@@ -59,40 +57,26 @@ public class HypercubeLib {
 
         HypercubeLibConstants.setModId("hypercubelib");
 
-        SDHeader header;
-
         long start = System.currentTimeMillis();
         try {
-            ObjectTypeRegistry.register(SDHeader.class);
-//
-//            header = new SDHeader();
-//            header.setDataLength(50);
-//
-//            byte[] serialized = new byte[header.size()];
-//            header.copyToBuffer(serialized, new IntRef(0));
-//
-//            FileUtils.writeFile(
-//                    new File(
-//                            FileUtils.getModCacheDir(
-//                                    HypercubeLibConstants.getModId()
-//                            ), "test" + HypercubeLibConstants.CACHE_FILE_EXT).toPath()
-//                    , serialized);
+            CacheFile file = new CacheFile("test2");
+            CacheItem item = new CacheItem();
+            item.payload = "This is a test payload".getBytes();
+            file.addData(item);
+            file.save();
         } catch (Exception e) {
             LOG.error("Congrats! A unicorn!", e);
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
 
-//        LOG.warn("Serialization finished! Time elapsed: " + timeElapsed + " ms");
+        LOG.warn("Serialization finished! Time elapsed: " + timeElapsed + " ms");
 
         start = System.currentTimeMillis();
         try {
-            byte[] data = FileUtils.readFile(new File(
-                    FileUtils.getModCacheDir(
-                            HypercubeLibConstants.getModId()
-                    ), "test" + HypercubeLibConstants.CACHE_FILE_EXT).toPath());
-
-            header = new SDHeader().copyFromBuffer(data, new IntRef(0));
+            CacheFile file = new CacheFile("test2");
+            file.load();
+            LOG.warn("Deserialized payload: " + new String(file.getData().getFirst().payload));
         } catch (Exception e) {
             LOG.error("Congrats! A unicorn!", e);
         }

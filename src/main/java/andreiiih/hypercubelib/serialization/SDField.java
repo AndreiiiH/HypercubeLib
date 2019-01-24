@@ -32,7 +32,6 @@
 package andreiiih.hypercubelib.serialization;
 
 import andreiiih.hypercubelib.core.IntRef;
-import andreiiih.hypercubelib.core.Ref;
 import andreiiih.hypercubelib.exceptions.ArgumentTooLargeException;
 import andreiiih.hypercubelib.exceptions.UnsupportedContainerTypeException;
 import andreiiih.hypercubelib.exceptions.UnsupportedDataTypeException;

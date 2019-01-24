@@ -36,7 +36,7 @@ import andreiiih.hypercubelib.exceptions.ArgumentTooLargeException;
 import andreiiih.hypercubelib.exceptions.UnsupportedContainerTypeException;
 import andreiiih.hypercubelib.exceptions.UnsupportedDataTypeException;
 
-public final class SDArray extends SDField {
+public class SDArray extends SDField {
 
     private SDArray(String name, byte dataType) throws ArgumentTooLargeException {
         super(ContainerType.ARRAY, name, dataType);

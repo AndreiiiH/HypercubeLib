@@ -31,16 +31,26 @@
  */
 package andreiiih.hypercubelib.serialization;
 
+import andreiiih.hypercubelib.HypercubeLib;
 import andreiiih.hypercubelib.core.BiMap;
 import andreiiih.hypercubelib.exceptions.IdentifierNotFoundException;
 import andreiiih.hypercubelib.exceptions.TypeAlreadyRegisteredException;
 
 public final class ObjectTypeRegistry {
 
-    private static final BiMap<Class<? extends SDObject>, Byte> idMap = new BiMap<>();
+    private static final BiMap<Class<? extends SDPart>, Byte> idMap = new BiMap<>();
     private static byte nextId = 0;
 
-    public static byte register(Class<? extends SDObject> type) throws TypeAlreadyRegisteredException {
+    static {
+        try {
+            ObjectTypeRegistry.register(SDHeader.class);
+            ObjectTypeRegistry.register(SDBody.class);
+        } catch (TypeAlreadyRegisteredException e) {
+            HypercubeLib.LOG.error("Congratulations! You've found MissingNo!", e);
+        }
+    }
+
+    public static byte register(Class<? extends SDPart> type) throws TypeAlreadyRegisteredException {
         if (idMap.containsKey(type)) {
             throw new TypeAlreadyRegisteredException(type);
         }
@@ -50,7 +60,7 @@ public final class ObjectTypeRegistry {
         return nextId++;
     }
 
-    public static byte get(Class<? extends SDObject> type) throws IdentifierNotFoundException {
+    public static byte get(Class<? extends SDPart> type) throws IdentifierNotFoundException {
         if (!idMap.containsKey(type)) {
             throw new IdentifierNotFoundException(type);
         }
@@ -58,7 +68,7 @@ public final class ObjectTypeRegistry {
         return idMap.getValue(type);
     }
 
-    public static Class<? extends SDObject> get(byte id) throws IdentifierNotFoundException {
+    public static Class<? extends SDPart> get(byte id) throws IdentifierNotFoundException {
         if (!idMap.containsValue(id)) {
             throw new IdentifierNotFoundException(id);
         }

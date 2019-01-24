@@ -36,19 +36,19 @@ import andreiiih.hypercubelib.HypercubeLibConstants;
 import andreiiih.hypercubelib.core.IntRef;
 import andreiiih.hypercubelib.exceptions.IdentifierNotFoundException;
 
-public class SDHeader extends SDObject<SDHeader> {
+public class SDHeader extends SDPart<SDHeader> {
 
     protected String fileIdentifier = new String(HypercubeLibConstants.CACHE_FILE_ID);
     protected byte fileType;
     protected short fileVersion;
     protected String modId = HypercubeLibConstants.getModId();
-    protected long dataLength;
+    protected long numObjects;
 
     private SDField sdFileIdentifier;
     private SDField sdFileType;
     private SDField sdFileVersion;
     private SDField sdModId;
-    private SDField sdDataLength;
+    private SDField sdNumObjects;
 
     public SDHeader() throws IdentifierNotFoundException {
         this(HypercubeLibConstants.TYPE_MODEL, HypercubeLibConstants.MODEL_VERSION);
@@ -71,7 +71,7 @@ public class SDHeader extends SDObject<SDHeader> {
             sdFileType = SDField.Builder.Byte("fileType", fileType);
             sdFileVersion = SDField.Builder.Short("fileVersion", fileVersion);
             sdModId = SDField.Builder.String("modId", modId);
-            sdDataLength = SDField.Builder.Long("dataLength", dataLength);
+            sdNumObjects = SDField.Builder.Long("dataLength", numObjects);
         } catch (Exception e) {
             HypercubeLib.LOG.error("Error encountered during header init", e);
         }
@@ -85,7 +85,7 @@ public class SDHeader extends SDObject<SDHeader> {
         sdFileType.copyToBuffer(dest, pointer);
         sdFileVersion.copyToBuffer(dest, pointer);
         sdModId.copyToBuffer(dest, pointer);
-        sdDataLength.copyToBuffer(dest, pointer);
+        sdNumObjects.copyToBuffer(dest, pointer);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class SDHeader extends SDObject<SDHeader> {
             sdFileType.copyFromBuffer(src, pointer);
             sdFileVersion.copyFromBuffer(src, pointer);
             sdModId.copyFromBuffer(src, pointer);
-            sdDataLength.copyFromBuffer(src, pointer);
+            sdNumObjects.copyFromBuffer(src, pointer);
         } catch (Exception e) {
             HypercubeLib.LOG.error(e);
         }
@@ -106,7 +106,7 @@ public class SDHeader extends SDObject<SDHeader> {
         fileType = (byte)sdFileType.deserialise();
         fileVersion = (short)sdFileVersion.deserialise();
         modId = (String)sdModId.deserialise();
-        dataLength = (long)sdDataLength.deserialise();
+        numObjects = (long)sdNumObjects.deserialise();
 
         return this;
     }
@@ -119,7 +119,7 @@ public class SDHeader extends SDObject<SDHeader> {
                 sdFileType.size() +
                 sdFileVersion.size() +
                 sdModId.size() +
-                sdDataLength.size();
+                sdNumObjects.size();
     }
 
     public String getFileIdentifier() {
@@ -138,12 +138,12 @@ public class SDHeader extends SDObject<SDHeader> {
         return this.modId;
     }
 
-    public void setDataLength(long dataLength) {
-        this.dataLength = dataLength;
-        this.sdDataLength.serialize(dataLength);
+    public void setNumObjects(long numObjects) {
+        this.numObjects = numObjects;
+        this.sdNumObjects.serialize(numObjects);
     }
 
-    public long getDataLength() {
-        return this.dataLength;
+    public long getNumObjects() {
+        return this.numObjects;
     }
 }

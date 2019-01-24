@@ -31,20 +31,77 @@
  */
 package andreiiih.hypercubelib.cache;
 
+import andreiiih.hypercubelib.HypercubeLib;
 import andreiiih.hypercubelib.HypercubeLibConstants;
+import andreiiih.hypercubelib.core.IntRef;
+import andreiiih.hypercubelib.serialization.SDBody;
+import andreiiih.hypercubelib.serialization.SDHeader;
+import andreiiih.hypercubelib.serialization.SDObject;
 import andreiiih.hypercubelib.util.FileUtils;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.LinkedList;
 
 public final class CacheFile {
 
     private final String fileName;
     private final Path filePath;
 
+    private SDHeader header;
+    private SDBody body;
+
     public CacheFile(String fileName) {
         this.fileName = fileName;
         this.filePath = new File(FileUtils.getModCacheDir(HypercubeLibConstants.getModId()),
                 fileName + HypercubeLibConstants.CACHE_FILE_EXT).toPath();
+
+        try {
+            header = new SDHeader();
+            body = new SDBody();
+        } catch (Exception e) {
+            HypercubeLib.LOG.error("Error during cache file instantiation", e);
+        }
+    }
+
+    public void addData(CacheItem data) {
+        body.addObject(data);
+        header.setNumObjects(header.getNumObjects() + 1);
+    }
+
+    public LinkedList<CacheItem> getData() {
+        LinkedList<CacheItem> converted = new LinkedList<>();
+
+        for (SDObject obj : body.getObjects()) {
+            converted.add((CacheItem)obj);
+        }
+
+        return converted;
+    }
+
+    public void save() {
+        byte[] data = new byte[header.size() + body.size()];
+        IntRef pointer = new IntRef(0);
+
+        header.copyToBuffer(data, pointer);
+        body.copyToBuffer(data, pointer);
+
+        try {
+            FileUtils.writeFile(filePath, data);
+        } catch (Exception e) {
+            HypercubeLib.LOG.error("Error during cache file saving", e);
+        }
+    }
+
+    public void load() {
+        try {
+            byte[] data = FileUtils.readFile(filePath);
+            IntRef pointer = new IntRef(0);
+
+            header.copyFromBuffer(data, pointer);
+            body.copyFromBuffer(data, pointer);
+        } catch (Exception e) {
+            HypercubeLib.LOG.error("Error during cache file loading", e);
+        }
     }
 }
