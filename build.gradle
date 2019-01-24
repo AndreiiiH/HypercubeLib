@@ -22,6 +22,7 @@ versioning {
     major 1
     minor 0
     patch 0
+    saveOn "build"
     preRelease "-beta1"
 //  preRelease "-rc1"
 //  preRelease "-final"
@@ -66,6 +67,14 @@ processResources {
 }
 
 version = "${minecraft.version}-${version}"
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
 
 license {
     header = file('LICENSE.txt')

@@ -17,6 +17,7 @@ jobs:
           paths:
             - ~/.gradle
           key: hypercubelib-{{ checksum "build.gradle" }}
+      - run: export TERM=${TERM:-dumb} && ./gradlew -q licenseFormat
       - run: export TERM=${TERM:-dumb} && ./gradlew build
       - store_artifacts:
           path: build/libs
